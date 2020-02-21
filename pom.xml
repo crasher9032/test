@@ -19,11 +19,12 @@
 			<scope>compile</scope>
 			<optional>true</optional>
 		</dependency>
-			<!-- https://mvnrepository.com/artifact/org.mongodb/mongodb-driver -->
+		<!-- https://mvnrepository.com/artifact/org.json/json -->
 		<dependency>
-		    <groupId>org.mongodb</groupId>
-		    <artifactId>mongodb-driver</artifactId>
-		    <version>3.12.1</version>
+		    <groupId>org.json</groupId>
+		    <artifactId>json</artifactId>
+		    <version>20190722</version>
 		</dependency>
+				
   </dependencies>
 </project>

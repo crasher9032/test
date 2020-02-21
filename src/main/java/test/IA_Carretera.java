@@ -5,15 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.bson.Document;
-
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 class IA_Carretera {
     /*
@@ -54,10 +47,10 @@ class IA_Carretera {
     */
 	
 	//Mongo
-	static MongoClient mongo = new MongoClient("localhost", 27017);
-	static MongoDatabase db = mongo.getDatabase("caminos");
+	//static MongoClient mongo = new MongoClient("localhost", 27017);
+	//static MongoDatabase db = mongo.getDatabase("caminos");
 	//static DBCollection collection = db.getCollection("ejecuciones");
-	static MongoCollection<Document> col = db.getCollection("ejecuciones");
+	//static MongoCollection<Document> col = db.getCollection("ejecuciones");
 	static int seccionCon = 0;
 	static int caminoCon = 0;
 	
@@ -812,7 +805,34 @@ class IA_Carretera {
     	public static void toDBObject(float[] seccion, float[] carrito, String suceso) {
     		try {
     			
-    			Document document = new Document("camino", caminoCon).
+    			JSONArray obj = new JSONArray();
+    			obj.put(suceso);
+    			
+    			JSONObject jo = new JSONObject();
+    			jo.put("camino", caminoCon);
+    			jo.put("seccion", seccionCon);
+    			jo.put("complejidad_seccion", seccion[1]);
+				jo.put("tiempo_seccion", seccion[2]);
+				jo.put("longitud_seccion", seccion[3]);
+				jo.put("tipo_seccion", seccion[4]);
+				jo.put("estatus_seccion", seccion[5]);
+				jo.put("velocidad_original", carrito[0]);
+				jo.put("calidad_auto", carrito[1]);
+				jo.put("estado_auto", carrito[2]);
+				jo.put("llantas_tipo", carrito[3]);
+				jo.put("llantas_estado", carrito[4]);
+				jo.put("hora_salida", carrito[5]);
+				jo.put("recorrido", carrito[6]);
+				jo.put("tiempo_viaje", carrito[7]);
+				jo.put("sueno", carrito[8]);
+				jo.put("herramienta", carrito[9]);
+				jo.put("riesgo_accidente", carrito[10]);
+				jo.put("velocidad_actual", carrito[11]);
+				obj.put(jo);
+				
+				System.out.println(obj);
+    			
+    			/*Document document = new Document("camino", caminoCon).
     					append("seccion", seccionCon).
     					append("", new Document()).
     						append("suceso", suceso).
@@ -835,7 +855,7 @@ class IA_Carretera {
 	    					append("velocidad_actual", carrito[11]);
     			col.insertOne(document);
     			 
-				 /*BasicDBObject DBObjectDatos = new BasicDBObject();
+				 BasicDBObject DBObjectDatos = new BasicDBObject();
 				 DBObjectDatos.append("suceso", suceso);
 				 DBObjectDatos.append("velocidad_original", carrito[0]);
 				 DBObjectDatos.append("calidad_auto", carrito[1]);
