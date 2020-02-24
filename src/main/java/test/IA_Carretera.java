@@ -85,7 +85,7 @@ class IA_Carretera {
             flagSenales,
             noche;
     static int caminos = 3;
-    static int resto=0;
+    //static int resto=0;
     static boolean fin=false;
     static float[] suma_total = new float[caminos];
     static List<Integer> talleres = new ArrayList<Integer>();
@@ -359,7 +359,7 @@ class IA_Carretera {
                 }
             }else{
                 System.out.println("Oh no, parece que el auto exploto en la seccion"+i);
-                carrito[6]=resto;
+                //carrito[6]=resto;
                 fin=true;
             }
         }
@@ -367,12 +367,14 @@ class IA_Carretera {
     static void eventos(float[] seccion, float[] carrito){
         try {
             if(fin==false){
-                if(tempTerreno!=0){
+                /*(tempTerreno!=0){
                     carrito[11]+=tempTerreno;
                     tempTerreno=0;
-                }
+                }*/
+            	tempTerreno=0;
                 int tramo=(int)(carrito[6]+seccion[3]);
                 //resto+=seccion[3];
+                int resto=(tramo%1000);
                 for (int i = (int)carrito[6]; i < tramo; i+=1000) {
                     //Dia noche
                     if(carrito[7]>1440){
@@ -406,7 +408,7 @@ class IA_Carretera {
                     	datos.toDBObject(seccion, carrito, "corridos muy alterados");
                         corridos=(int)(carrito[7]+60);
                         System.out.println("Parece que alguien encontro una cancion del comander :)");
-                        carrito[11]+=(float)(carrito[0]*.15);
+                        carrito[11]+=(carrito[0]*.15);
                         contCorridos=(int)carrito[7]+60;
                     }
                     //animal en el camino
@@ -421,7 +423,7 @@ class IA_Carretera {
                     }
                     if(suceso(20) && flagSenales==false){
                     	datos.toDBObject(seccion, carrito, "falta de senalamientos");
-                        System.out.println("No existen los suficientes señalamientos");
+                        System.out.println("No existen los suficientes seï¿½alamientos");
                         carrito[10]+=8;
                     }
                     //no trafico
@@ -444,7 +446,7 @@ class IA_Carretera {
                     }
                     if(suceso(10)){
                     	datos.toDBObject(seccion, carrito, "lluvia");
-                        System.out.println("Una pequeña lluvia");
+                        System.out.println("Una pequeï¿½a lluvia");
                         lluvia=(int)(carrito[7]+60);
                         carrito[11]=(float)((carrito[11])-(carrito[0]*.2));
                         carrito[10]+=5;
@@ -467,7 +469,7 @@ class IA_Carretera {
                     //sueÃ±o
                     if((carrito[7]-carrito[5])>180){
                     	datos.toDBObject(seccion, carrito, "sueno");
-                        System.out.println("Tengo algo de sueño");
+                        System.out.println("Tengo algo de sueï¿½o");
                         horas=(int)(carrito[7]);
                         carrito[10]+=(horas*2.5);
                         carrito[8]+=(horas*5);
@@ -535,7 +537,7 @@ class IA_Carretera {
                             if(suceso(10)){
                                 System.out.println("Hasta aqui llegaste morro X(");
                                 datos.toDBObject(seccion, carrito, "secuestro");
-                                carrito[6]=resto;
+                                //carrito[6]=resto;
                                 fin=true;
                                 return;
                             }
@@ -552,7 +554,7 @@ class IA_Carretera {
                         if(suceso(8)){
                             System.out.println("Hola mamis");
                             datos.toDBObject(seccion, carrito, "morritas");
-                            contMorritas=(int)(carrito[6]+60);
+                            contMorritas=(int)(+60);
                             flagMorritas=true;
                             carrito[11]=(int)(carrito[11]-(carrito[0]*.15));
                         }
@@ -636,7 +638,7 @@ class IA_Carretera {
                         if(suceso(10)){
                             System.out.println("Adios mundo cruel");
                             datos.toDBObject(seccion, carrito, "muerte por choque");
-                            carrito[6]=resto;
+                            //carrito[6]=resto;
                             fin=true;
                             return;
                         }else{
@@ -661,6 +663,7 @@ class IA_Carretera {
                         carrito[7]-=10;
                         atajo=ataj;
                     }
+                    int vel=(int) carrito[11];
                     //Tipo
                     switch((int)seccion[4]){
                         case 25:
@@ -729,13 +732,19 @@ class IA_Carretera {
                             }
                             break;
                     }
-                    carrito[11]-=tempTerreno;
+                    carrito[11]=(carrito[11]-tempTerreno);
                     //tiempo
-                    float mts_seg=0;
-                    mts_seg=((carrito[11]*1000)/60);
-                    carrito[7]+=(int)((1000/mts_seg))/60;
+                    try {
+                    float mts_min=0;
+                    mts_min=((carrito[11]*1000)/60);
+                    carrito[7]+=(((1000/mts_min)));
                     carrito[6]+=1000;
+                    carrito[11]=vel;
+                    }catch (Exception e) {
+                    	System.out.println(e);
+					}
                 }
+                carrito[6]+=resto;
             }
         } catch (Exception e) {
             System.out.println(e);
@@ -781,7 +790,7 @@ class IA_Carretera {
             if(Tcercano!=100000 && Gcercano!=100000){
                 int camino=Gcercano<Tcercano? Gcercano:Tcercano;
                 
-                carrito1[7]+=(int)camino/(((carrito1[0]*1000)/60));
+                carrito1[7]+=20;
                 carrito1[6]=camino;
             }
         }catch (Exception e){
