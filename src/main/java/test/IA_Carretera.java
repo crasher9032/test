@@ -1,12 +1,9 @@
 package test;
 
-import java.security.cert.CollectionCertStoreParameters;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 class IA_Carretera {
     /*
@@ -52,7 +49,8 @@ class IA_Carretera {
 	//static DBCollection collection = db.getCollection("ejecuciones");
 	//static MongoCollection<Document> col = db.getCollection("ejecuciones");
 	static int seccionCon = 0;
-	static int caminoCon = 0;
+	static int caminoCon = 1;
+	static Connection conexion = new Conexion().obtener();
 	
     static int corridos,
             lluvia,
@@ -97,6 +95,7 @@ class IA_Carretera {
     public static void main(String[] args) {
     	
     	//Object
+    	
     	
     	
         talleres.add(0);
@@ -159,6 +158,7 @@ class IA_Carretera {
             fin=false;
             i++;
             caminoCon++;
+            seccionCon=0;
         }
         cont=1;
         System.out.println("+++++++++++++++++++++++++++++++++++++++++++");
@@ -372,11 +372,11 @@ class IA_Carretera {
                     tempTerreno=0;
                 }
                 int tramo=(int)(carrito[6]+seccion[3]);
-                resto+=seccion[3];
-                for (int i = (int)carrito[6]; i < resto; i+=1000) {
+                //resto+=seccion[3];
+                for (int i = (int)carrito[6]; i < tramo; i+=1000) {
                     //Dia noche
-                    if(carrito[6]>1440){
-                        int hora=(int)carrito[6]%1440;
+                    if(carrito[7]>1440){
+                        int hora=(int)carrito[7]%1440;
                         if(hora>480 && hora<1080){
                             noche=false;
                         }else{
@@ -790,7 +790,7 @@ class IA_Carretera {
         return flag;
     }
 
-    private static void imprimirCoche(float[][] fs) {
+    static void imprimirCoche(float[][] fs) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     static class datos{
@@ -805,7 +805,21 @@ class IA_Carretera {
     	public static void toDBObject(float[] seccion, float[] carrito, String suceso) {
     		try {
     			
-    			JSONArray obj = new JSONArray();
+    			PreparedStatement consulta;
+    			consulta=conexion.prepareStatement("INSERT INTO `"+caminoCon+"` "
+    					+ "(`suceso`, `seccion`, `velocidad_maxima`, "
+    					+ "`calidad_auto`, `estado_auto`, `tipo_llantas`,"
+    					+ "`estado_llantas`, `hora_salida`, `distancia_recorrida`,"
+    					+ "`tiempo_viaje`, `sueno_conductor`, `herramientas`, "
+    					+ "`riesgo_accidente`, `velocidad_actual` ) "
+    					+ "VALUES ('"+suceso+"', '"+seccionCon+"', '"+((int)(carrito[0]))+"'"
+    							+ ", '"+((int)(carrito[1]))+"', '"+((int)(carrito[2]))+"', '"+((int)(carrito[3]))+"', "
+								+ "'"+((int)(carrito[4]))+"', '"+((int)(carrito[5]))+"', '"+((int)(carrito[6]-carrito[5]))+"',"
+								+ "'"+((int)(carrito[7]))+"', '"+((int)(carrito[8]))+"', '"+((int)(carrito[9]))+"', "
+								+ "'"+((int)(carrito[10]))+"', '"+((int)(carrito[11]))+"');");
+    			consulta.execute();
+    			
+    			/*JSONArray obj = new JSONArray();
     			obj.put(suceso);
     			
     			JSONObject jo = new JSONObject();
@@ -832,7 +846,7 @@ class IA_Carretera {
 				
 				System.out.println(obj);
     			
-    			/*Document document = new Document("camino", caminoCon).
+    			Document document = new Document("camino", caminoCon).
     					append("seccion", seccionCon).
     					append("", new Document()).
     						append("suceso", suceso).
