@@ -2,6 +2,7 @@ package test;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,10 +72,10 @@ class IA_Carretera {
             bache=0,
             huachicol=0,
             deslave=0,
-            tempTerreno=0,
             motel=0,
             dia,
             atajo=0;
+	static float tempTerreno=0;
     static boolean flagLluvia,
             flagNieve,
             flagFantasma,
@@ -403,6 +404,28 @@ class IA_Carretera {
                     int ataj=(int)(carrito[6])/20000;
                     int fantasm=(int)(carrito[6]/80000);
                     ///////////////Eventos de seccion////////////////
+                  //accidente
+                    if(suceso((int)(carrito[10]))){
+                        System.out.println("Veo la luz");
+                        if(suceso(10)){
+                            System.out.println("Adios mundo cruel");
+                            guardar(seccion, carrito, "muerte por choque");
+                            //carrito[6]=resto;
+                            fin=true;
+                            return;
+                        }else{
+                            System.out.println("Parece que no fue para tanto");
+                            guardar(seccion, carrito, "choque menor");
+                            if(salvacion((int)(carrito[6]),carrito)){
+                                System.out.println("Encontre la forma de reparar mi auto");
+                                guardar(seccion, carrito, "reparacion");
+                            }else{
+                                fin=true;
+                                System.out.println("Aunque mi auto no lo logro");
+                                guardar(seccion, carrito, "fin por auto descompuesto");
+                            }
+                        }
+                    }
                     //Corridos alterados
                     if(flagCorridos && contCorridos<carrito[7]){
                         carrito[11]=(float) ((carrito[11]-(carrito[0]*.15)));
@@ -524,6 +547,7 @@ class IA_Carretera {
                             guardar(seccion, carrito, "gasolinera");
                             if(carrito[12]<20){
                                 System.out.println("10 pesos de la roja por favor");
+                                guardar(seccion, carrito, "recargar gasolina");
                                 carrito[12]=40;
                             }
                         }
@@ -571,14 +595,14 @@ class IA_Carretera {
                     }
                     //cerveza
                     if(flagCerveza && carrito[7]>contCerveza){
-                        carrito[10]-=15;
+                        carrito[10]=(carrito[10]-15);
                         flagCerveza=false;
                     }
                     if(cerveza!=cervez){
                         System.out.println("Cerveza, cerveza");
                         guardar(seccion, carrito, "cerveza");
                         if(suceso(15)){
-                            carrito[10]+=15;
+                            carrito[10]=(carrito[10]+15);
                             flagCerveza=true;
                             contCerveza=(int)(carrito[7]+60);
                         }
@@ -589,7 +613,7 @@ class IA_Carretera {
                         if(suceso(50)){
                             System.out.println("Crei que era una carretera libre");
                             guardar(seccion, carrito, "caseta");
-                            carrito[7]+=5;
+                            carrito[7]=(carrito[7]+5);
                         }
                         caseta=caset;
                     }
@@ -598,7 +622,7 @@ class IA_Carretera {
                         if(suceso(30)){
                             System.out.println("Ese bache parecia la cueva del batman");
                             guardar(seccion, carrito, "bache");
-                            carrito[4]-=.5;
+                            carrito[4]=(float) (carrito[4]-.5);
                         }
                         bache=bach;
                     }
@@ -607,14 +631,15 @@ class IA_Carretera {
                             System.out.println("Es robada//Gasolina");
                             guardar(seccion, carrito, "huachicol");
                             if(suceso(35)){
-                                carrito[2]-=10;
+                            	guardar(seccion, carrito, "dano por huachicol");
+                                carrito[2]=(carrito[2]-10);
                             }
                         }
                         huachicol=huachico;
                     }
                     //deslave
                     if(flagDeslave){
-                        carrito[10]-=50;
+                        carrito[10]=(carrito[10]-50);
                         flagDeslave=false;
                     }
                     if(deslave!=deslav){
@@ -622,7 +647,7 @@ class IA_Carretera {
                         if(suceso(prob)){
                             System.out.println("Oh no, un guijarro en el pavimento");
                             guardar(seccion, carrito, "deslave");
-                            carrito[10]+=50;
+                            carrito[10]=(carrito[10]-50);
                             flagDeslave=true;
                         }
                         deslave=deslav;
@@ -636,56 +661,33 @@ class IA_Carretera {
                             if(flagMorritas=true){
                                 System.out.println("Oh si, oh si");
                                 guardar(seccion, carrito, "oh yeah");
+                                carrito[7]=(carrito[7]+60);
                                 flagMorritas=false;
                             }
                         }
                         motel=mote;
                     }
-                    //accidente
-                    if(suceso((int)(carrito[10]))){
-                        System.out.println("Veo la luz");
-                        if(suceso(10)){
-                            System.out.println("Adios mundo cruel");
-                            guardar(seccion, carrito, "muerte por choque");
-                            //carrito[6]=resto;
-                            fin=true;
-                            return;
-                        }else{
-                            System.out.println("Parece que no fue para tanto");
-                            guardar(seccion, carrito, "choque menor");
-                            if(salvacion((int)(carrito[6]),carrito)){
-                                System.out.println("Encontre la forma de reparar mi auto");
-                                guardar(seccion, carrito, "reparacion");
-                            }else{
-                                fin=true;
-                                System.out.println("Aunque mi auto no lo logro");
-                                guardar(seccion, carrito, "fin por auto descompuesto");
-                            }
-                        }
-                    }
                     //Atajo
-                    if(atajo!=ataj){
-                        
-                    }
                     if(suceso(10)){
                         System.out.println("Mira un atajo");
-                        carrito[7]-=10;
+                        carrito[7]=(carrito[7]-15);
                         atajo=ataj;
                     }
+                    tempTerreno=0;
                     int vel=(int) carrito[11];
                     //Tipo
                     switch((int)seccion[4]){
                         case 25:
                             switch((int)(carrito[3])){
                                 case 1:
-                                    carrito[4]-=.1;
+                                    carrito[4]=(float) (carrito[4]-.1);
                                     break;
                                 case 2:
-                                    carrito[4]-=.1;
+                                	carrito[4]=(float) (carrito[4]-.1);
                                     break;
                                 case 3:
-                                    carrito[4]-=.1;
-                                    tempTerreno-=(carrito[0]*.1);
+                                	carrito[4]=(float) (carrito[4]-.1);
+                                    tempTerreno=(float) (tempTerreno-(carrito[0]*.1));
                                     break;
                             }
                             break;
@@ -693,16 +695,16 @@ class IA_Carretera {
                             tempTerreno-=(carrito[0]*.5);
                             switch((int)(carrito[3])){
                                 case 1:
-                                    carrito[4]-=.3;
-                                    tempTerreno-=(carrito[0]*.05);
+                                	carrito[4]=(float) (carrito[4]-.3);
+                                	tempTerreno=(float) (tempTerreno-(carrito[0]*.05));
                                     break;
                                 case 2:
-                                    carrito[4]-=.2;
-                                    tempTerreno-=(carrito[0]*.05);
+                                	carrito[4]=(float) (carrito[4]-.2);
+                                	tempTerreno=(float) (tempTerreno-(carrito[0]*.05));
                                     break;
                                 case 3:
-                                    carrito[4]-=.2;
-                                    tempTerreno-=(carrito[0]*.08);
+                                	carrito[4]=(float) (carrito[4]-.2);
+                                	tempTerreno=(float) (tempTerreno-(carrito[0]*.08));
                                     break;
                             }
                             break;
@@ -710,16 +712,16 @@ class IA_Carretera {
                             tempTerreno-=(carrito[0]*.1);
                             switch((int)(carrito[3])){
                                 case 1:
-                                    carrito[4]-=.4;
-                                    tempTerreno-=(carrito[0]*.1);
+                                	carrito[4]=(float) (carrito[4]-.4);
+                                	tempTerreno=(float) (tempTerreno-(carrito[0]*.1));
                                     break;
                                 case 2:
-                                    carrito[4]-=.3;
-                                    tempTerreno-=(carrito[0]*.07);
+                                	carrito[4]=(float) (carrito[4]-.3);
+                                	tempTerreno=(float) (tempTerreno-(carrito[0]*.07));
                                     break;
                                 case 3:
-                                    carrito[4]-=.3;
-                                    tempTerreno-=(carrito[0]*.05);
+                                	carrito[4]=(float) (carrito[4]-.3);
+                                	tempTerreno=(float) (tempTerreno-(carrito[0]*.05));
                                     break;
                             }
                             break;
@@ -727,16 +729,16 @@ class IA_Carretera {
                             tempTerreno-=(carrito[0]*.15);
                             switch((int)(carrito[3])){
                                 case 1:;
-                                    carrito[4]-=.5;
-                                    tempTerreno-=(carrito[0]*.15);
+                                carrito[4]=(float) (carrito[4]-.5);
+                            	tempTerreno=(float) (tempTerreno-(carrito[0]*.15));
                                     break;
                                 case 2:
-                                    carrito[4]-=.3;
-                                    tempTerreno-=(carrito[0]*.1);
+                                	carrito[4]=(float) (carrito[4]-.3);
+                                	tempTerreno=(float) (tempTerreno-(carrito[0]*.1));
                                     break;
                                 case 3:
-                                    carrito[4]-=.1;
-                                    tempTerreno-=(carrito[0]*.05);
+                                	carrito[4]=(float) (carrito[4]-.1);
+                                	tempTerreno=(float) (tempTerreno-(carrito[0]*.05));
                                     break;
                             }
                             break;
@@ -746,14 +748,15 @@ class IA_Carretera {
                     try {
                     float mts_min=0;
                     mts_min=((carrito[11]*1000)/60);
-                    carrito[7]+=(((1000/mts_min)));
-                    carrito[6]+=1000;
+                    carrito[7]=(carrito[7]+(x/mts_min));
+                    carrito[6]=(carrito[6]+x);
                     carrito[11]=vel;
+                    carrito[12]=(carrito[12]-2);
                     }catch (Exception e) {
                     	System.out.println(e);
 					}
                 }
-                carrito[6]+=resto;
+                carrito[6]=(carrito[6]+resto);
             }
         } catch (Exception e) {
             System.out.println(e);
@@ -827,13 +830,13 @@ class IA_Carretera {
 					+ "`calidad_auto`, `estado_auto`, `tipo_llantas`,"
 					+ "`estado_llantas`, `hora_salida`, `distancia_recorrida`,"
 					+ "`tiempo_viaje`, `sueno_conductor`, `herramientas`, "
-					+ "`riesgo_accidente`, `velocidad_actual` ) "
+					+ "`riesgo_accidente`, `velocidad_actual`, `gasolina` ) "
 					+ "VALUES ('"+suceso+"', '"+seccionCon+"', '"+((int)(carrito[0]))+"'"
 					+ ", '"+((int)(carrito[1]))+"', '"+((int)(carrito[2]))+"', '"+((int)(carrito[3]))+"', "
-					+ "'"+((int)(carrito[4]))+"', '"+((int)(carrito[5]))+"', '"+((int)(carrito[6]-carrito[5]))+"',"
-					+ "'"+((int)(carrito[7]))+"', '"+((int)(carrito[8]))+"', '"+((int)(carrito[9]))+"', "
-					+ "'"+((int)(carrito[10]))+"', '"+((int)(carrito[11]))+"');");
-			System.out.println(consulta);
+					+ "'"+((int)(carrito[4]))+"', '"+((int)(carrito[5]))+"', '"+((int)(carrito[6]))+"',"
+					+ "'"+((int)(carrito[7]-carrito[5]))+"', '"+((int)(carrito[8]))+"', '"+((int)(carrito[9]))+"', "
+					+ "'"+((int)(carrito[10]))+"', '"+((int)(carrito[11]))+"', '"+((int)(carrito[12]))+"');");
+			//System.out.println(consulta);
 			consulta.execute();
     			
     			/*JSONArray obj = new JSONArray();
@@ -912,5 +915,10 @@ class IA_Carretera {
 		 }catch (Exception e) {
 			System.out.println(e);
 		 }
+		try {
+			conexion.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	 }
 }
